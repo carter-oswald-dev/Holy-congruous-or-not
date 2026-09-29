@@ -40,12 +40,12 @@ select {
 width: 100%;
 padding: .7rem .9rem;
 font: inherit;
-color: var(–chalk);
-background: var(–nave-deep);
+color: var(--chalk);
+background: var(--nave-deep);
 border: 2px solid #34467a;
 border-radius: 6px;
 }
-select:focus-visible { outline: 3px solid var(–brass); outline-offset: 2px; }
+select:focus-visible { outline: 3px solid var(--brass); outline-offset: 2px; }
 label.gap { margin-top: 1.25rem; }
 textarea {
 width: 100%;
@@ -54,13 +54,13 @@ resize: vertical;
 padding: .9rem 1rem;
 font: inherit;
 font-size: 1.05rem;
-color: var(–chalk);
-background: var(–nave-deep);
+color: var(--chalk);
+background: var(--nave-deep);
 border: 2px solid #34467a;
 border-radius: 6px;
 }
-textarea:focus-visible, input:focus-visible { outline: 3px solid var(–brass); outline-offset: 2px; }
-.row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: .5rem; color: var(–mist); font-size: .95rem; }
+textarea:focus-visible, input:focus-visible { outline: 3px solid var(--brass); outline-offset: 2px; }
+.row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: .5rem; color: var(--mist); font-size: .95rem; }
 .row label { display: inline-flex; align-items: center; gap: .5rem; font-weight: 400; margin: 0; }
 
 /* the hymn board */
@@ -70,34 +70,34 @@ grid-template-columns: 1fr 1fr 1fr;
 gap: .5rem;
 margin: 1.75rem 0 .5rem;
 padding: .75rem;
-background: var(–board);
+background: var(--board);
 border: 6px solid #5b3d24;
 border-radius: 4px;
 }
 .slot { padding: .5rem .25rem; text-align: center; border: 1px solid #3a3a42; }
 .slot .n {
-font-family: var(–slab);
+font-family: var(--slab);
 font-weight: 700;
 font-size: clamp(1.6rem, 7vw, 3rem);
 line-height: 1.15;
 font-variant-numeric: tabular-nums;
 }
-.slot .t { font-size: .8rem; color: var(–mist); }
-.in .n { color: var(–brass); }
-.out .n { color: var(–oxblood); }
-.ratio .n { color: var(–chalk); }
+.slot .t { font-size: .8rem; color: var(--mist); }
+.in .n { color: var(--brass); }
+.out .n { color: var(--oxblood); }
+.ratio .n { color: var(--chalk); }
 
-.verdict { font-family: var(–slab); font-size: 1.15rem; margin: .75rem 0 1.5rem; min-height: 1.6em; }
+.verdict { font-family: var(--slab); font-size: 1.15rem; margin: .75rem 0 1.5rem; min-height: 1.6em; }
 
-h2 { font-family: var(–slab); font-size: 1.15rem; margin: 1.5rem 0 .5rem; }
+h2 { font-family: var(--slab); font-size: 1.15rem; margin: 1.5rem 0 .5rem; }
 ul.chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
 .chips li { padding: .15rem .6rem; border-radius: 999px; font-size: .95rem; }
-.chips.found li { border: 1.5px solid var(–brass); color: var(–brass); }
-.chips.missing li { border: 1.5px solid var(–oxblood); color: var(–oxblood); }
-.empty { color: var(–mist); font-size: .95rem; }
+.chips.found li { border: 1.5px solid var(--brass); color: var(--brass); }
+.chips.missing li { border: 1.5px solid var(--oxblood); color: var(--oxblood); }
+.empty { color: var(--mist); font-size: .95rem; }
 
-#status { margin-top: 2.5rem; font-size: .85rem; color: var(–mist); }
-#status.bad { color: var(–oxblood); font-size: 1rem; }
+#status { margin-top: 2.5rem; font-size: .85rem; color: var(--mist); }
+#status.bad { color: var(--oxblood); font-size: 1rem; }
 
 @media (max-width: 30rem) { .slot .t { font-size: .72rem; } }
 </style>
@@ -106,13 +106,13 @@ ul.chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wr
 <body>
 <main>
   <h1>None of these words are in the Bible</h1>
-  <p class="lede">The idea behind this site is that often when you see people online talking about something confusing or bewildering that someone said, you’ll often see people comment in response to their confusion along the lines of, “None of these words are in the Bible.”
+  <p class="lede">The idea behind this site is that often when you see people online talking about something confusing or bewildering that someone said, you'll often see people comment in response to their confusion along the lines of, "None of these words are in the Bible."</p>
 
-Well, what if we took that idea to its literal conclusion and saw how much a statement is or isn’t in line with the Bible?
+  <p class="lede">Well, what if we took that idea to its literal conclusion and saw how much a statement is or isn't in line with the Bible?</p>
 
-What you can do is take the statement someone said and input it right down below, and the site will calculate the ratio/percentage of words used that are in the Bible and those that aren’t.
+  <p class="lede">What you can do is take the statement someone said and input it right down below, and the site will calculate the ratio/percentage of words used that are in the Bible and those that aren't.</p>
 
-With that, you can see how similar or dissimilar a piece of text truly is to the Bible.
+  <p class="lede">With that, you can see how similar or dissimilar a piece of text truly is to the Bible.
 For your options, there are 3 versions of the Bible, which are:</p>
 
 <label for="bible">Which Bible?</label>
@@ -139,7 +139,7 @@ For your options, there are 3 versions of the Bible, which are:</p>
   <h2>In the Bible</h2>
   <ul class="chips found" id="found"></ul>
 
-  <p id="status">Loading word list…</p>
+  <p id="status">Loading word list���</p>
 </main>
 
 <script>
