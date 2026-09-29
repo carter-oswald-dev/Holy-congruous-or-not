@@ -1,0 +1,23 @@
+[
+ {
+  "id": "kjv",
+  "title": "The King James Version of the Bible",
+  "file": "words-kjv.json",
+  "totalWords": 790412,
+  "uniqueWords": 12773
+ },
+ {
+  "id": "web",
+  "title": "The World English Bible (WEB), Complete",
+  "file": "words-web.json",
+  "totalWords": 769110,
+  "uniqueWords": 12796
+ },
+ {
+  "id": "douay-rheims",
+  "title": "The Bible, Douay-Rheims, Complete",
+  "file": "words-douay-rheims.json",
+  "totalWords": 890053,
+  "uniqueWords": 14039
+ }
+]

@@ -1,0 +1,265 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>None of these words are in the Bible</title>
+<style>
+  :root {
+    --nave: #17264a;      /* stained-glass blue */
+    --nave-deep: #101a33;
+    --board: #1c1c20;     /* hymn board */
+    --chalk: #f3efe2;
+    --brass: #f2b134;     /* numbers that are in the Bible */
+    --oxblood: #e0574d;   /* numbers that are not */
+    --mist: #aab3cc;
+    --slab: "Rockwell", "Roboto Slab", "Courier New", Georgia, serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--nave);
+    color: var(--chalk);
+    font-family: var(--sans);
+    line-height: 1.5;
+  }
+  main { max-width: 46rem; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+  h1 {
+    font-family: var(--slab);
+    font-weight: 700;
+    font-size: clamp(1.9rem, 6vw, 3rem);
+    line-height: 1.1;
+    margin: 0 0 .5rem;
+  }
+  .lede { color: var(--mist); margin: 0 0 1.75rem; max-width: 38rem; }
+
+label { display: block; font-weight: 600; margin-bottom: .4rem; }
+select {
+width: 100%;
+padding: .7rem .9rem;
+font: inherit;
+color: var(–chalk);
+background: var(–nave-deep);
+border: 2px solid #34467a;
+border-radius: 6px;
+}
+select:focus-visible { outline: 3px solid var(–brass); outline-offset: 2px; }
+label.gap { margin-top: 1.25rem; }
+textarea {
+width: 100%;
+min-height: 9rem;
+resize: vertical;
+padding: .9rem 1rem;
+font: inherit;
+font-size: 1.05rem;
+color: var(–chalk);
+background: var(–nave-deep);
+border: 2px solid #34467a;
+border-radius: 6px;
+}
+textarea:focus-visible, input:focus-visible { outline: 3px solid var(–brass); outline-offset: 2px; }
+.row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: .5rem; color: var(–mist); font-size: .95rem; }
+.row label { display: inline-flex; align-items: center; gap: .5rem; font-weight: 400; margin: 0; }
+
+/* the hymn board */
+.board {
+display: grid;
+grid-template-columns: 1fr 1fr 1fr;
+gap: .5rem;
+margin: 1.75rem 0 .5rem;
+padding: .75rem;
+background: var(–board);
+border: 6px solid #5b3d24;
+border-radius: 4px;
+}
+.slot { padding: .5rem .25rem; text-align: center; border: 1px solid #3a3a42; }
+.slot .n {
+font-family: var(–slab);
+font-weight: 700;
+font-size: clamp(1.6rem, 7vw, 3rem);
+line-height: 1.15;
+font-variant-numeric: tabular-nums;
+}
+.slot .t { font-size: .8rem; color: var(–mist); }
+.in .n { color: var(–brass); }
+.out .n { color: var(–oxblood); }
+.ratio .n { color: var(–chalk); }
+
+.verdict { font-family: var(–slab); font-size: 1.15rem; margin: .75rem 0 1.5rem; min-height: 1.6em; }
+
+h2 { font-family: var(–slab); font-size: 1.15rem; margin: 1.5rem 0 .5rem; }
+ul.chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+.chips li { padding: .15rem .6rem; border-radius: 999px; font-size: .95rem; }
+.chips.found li { border: 1.5px solid var(–brass); color: var(–brass); }
+.chips.missing li { border: 1.5px solid var(–oxblood); color: var(–oxblood); }
+.empty { color: var(–mist); font-size: .95rem; }
+
+#status { margin-top: 2.5rem; font-size: .85rem; color: var(–mist); }
+#status.bad { color: var(–oxblood); font-size: 1rem; }
+
+@media (max-width: 30rem) { .slot .t { font-size: .72rem; } }
+</style>
+
+</head>
+<body>
+<main>
+  <h1>None of these words are in the Bible</h1>
+  <p class="lede">Type a sentence and see how many of its words appear anywhere in a pile of public-domain English Bibles.</p>
+
+<label for="bible">Which Bible?</label>
+<select id="bible" disabled><option>Loading…</option></select>
+
+<label for="input" class="gap">Your sentence</label>
+
+  <textarea id="input" maxlength="1024" placeholder="Type or paste up to 1,024 characters"></textarea>
+
+  <div class="row">
+    <span><span id="chars">0</span> / 1024 characters</span>
+    <label><input type="checkbox" id="repeats"> Count repeated words every time</label>
+  </div>
+
+  <div class="board" aria-live="polite">
+    <div class="slot in"><div class="n" id="pctIn">0%</div><div class="t">in the Bible</div></div>
+    <div class="slot out"><div class="n" id="pctOut">0%</div><div class="t">not in the Bible</div></div>
+    <div class="slot ratio"><div class="n" id="ratio">0 : 0</div><div class="t">in : not in</div></div>
+  </div>
+  <p class="verdict" id="verdict"></p>
+
+  <h2>Not in the Bible</h2>
+  <ul class="chips missing" id="missing"></ul>
+  <h2>In the Bible</h2>
+  <ul class="chips found" id="found"></ul>
+
+  <p id="status">Loading word list…</p>
+</main>
+
+<script>
+let known = new Set();   // words in the selected Bible
+let ready = false;
+let bibles = [];
+const cache = {};        // id -> Set of words
+
+const $ = id => document.getElementById(id);
+const input = $('input');
+
+// Must match the tokenizer in build-wordlist.js
+function tokens(s) {
+  return s.normalize('NFKC').toLowerCase().replace(/[\u2018\u2019`]/g, "'")
+    .match(/\p{L}+(?:'\p{L}+)*/gu) || [];
+}
+const gcd = (a, b) => b ? gcd(b, a % b) : a;
+const pct = (n, d) => d ? (Math.round(n / d * 1000) / 10) + '%' : '0%';
+
+function fill(ul, words) {
+  ul.replaceChildren();
+  if (!words.length) {
+    const li = document.createElement('li');
+    li.className = 'empty';
+    li.textContent = 'None';
+    li.style.border = '0';
+    ul.append(li);
+    return;
+  }
+  for (const w of words) {
+    const li = document.createElement('li');
+    li.textContent = w;
+    ul.append(li);
+  }
+}
+
+function analyze() {
+  $('chars').textContent = input.value.length;
+  if (!ready) return;
+
+  let toks = tokens(input.value);
+  if (!$('repeats').checked) toks = [...new Set(toks)];
+
+  const found = toks.filter(w => known.has(w));
+  const missing = toks.filter(w => !known.has(w));
+  const total = toks.length;
+
+  $('pctIn').textContent = pct(found.length, total);
+  $('pctOut').textContent = pct(missing.length, total);
+  const g = gcd(found.length, missing.length) || 1;
+  $('ratio').textContent = (found.length / g) + ' : ' + (missing.length / g);
+
+  $('verdict').textContent = !total ? ''
+    : missing.length === 0 ? 'Every word is in the Bible.'
+    : found.length === 0 ? 'None of these words are in the Bible.'
+    : found.length + ' of ' + total + ' word' + (total === 1 ? '' : 's') + ' in the Bible.';
+
+  fill($('missing'), missing);
+  fill($('found'), found);
+}
+
+input.addEventListener('input', analyze);
+$('repeats').addEventListener('change', analyze);
+
+async function load(id) {
+  if (cache[id]) return cache[id];
+  const b = bibles.find(x => x.id === id);
+  const r = await fetch(b.file);
+  if (!r.ok) throw new Error(b.file);
+  const d = await r.json();
+  return (cache[id] = new Set(d.words));
+}
+
+async function choose() {
+  const id = $('bible').value;
+  ready = false;
+  $('status').className = '';
+  $('status').textContent = 'Loading word list…';
+  try {
+    if (id === 'all') {
+      known = new Set();
+      for (const b of bibles) (await load(b.id)).forEach(w => known.add(w));
+      $('status').textContent = known.size.toLocaleString() + ' unique words across all ' + bibles.length + ' Bibles.';
+    } else {
+      known = await load(id);
+      const b = bibles.find(x => x.id === id);
+      $('status').textContent = known.size.toLocaleString() + ' unique words in ' + b.title + '.';
+    }
+    ready = true;
+    analyze();
+  } catch (e) {
+    $('status').className = 'bad';
+    $('status').textContent = 'Could not load the word list. Run build-wordlist.js and put the .json files next to this page.';
+  }
+}
+
+$('bible').addEventListener('change', choose);
+
+fetch('bibles.json')
+  .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then(list => {
+    bibles = list;
+    const sel = $('bible');
+    sel.replaceChildren();
+    for (const b of bibles) {
+      const o = document.createElement('option');
+      o.value = b.id;
+      o.textContent = b.title + ' (' + b.uniqueWords.toLocaleString() + ' unique words)';
+      sel.append(o);
+    }
+    if (bibles.length > 1) {
+      const o = document.createElement('option');
+      o.value = 'all';
+      o.textContent = 'All of them combined';
+      sel.append(o);
+    }
+    sel.disabled = false;
+    return choose();
+  })
+  .catch(() => {
+    $('bible').replaceChildren(new Option('Word lists missing'));
+    $('status').className = 'bad';
+    $('status').textContent = 'bibles.json not found. Run build-wordlist.js and put the .json files next to this page.';
+  });
+
+analyze();
+</script>
+
+</body>
+</html>
